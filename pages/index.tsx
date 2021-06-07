@@ -1,17 +1,20 @@
 import React from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useQuery } from 'react-query';
 import styles from '../styles/Home.module.scss';
+import { IPlayer } from './team/[id]';
 
 const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
-interface ITeam {
+export interface ITeam {
     id: number;
     crestUrl: string;
     shortName: string;
     founded: string;
     venue: string;
+    squad: IPlayer[];
 }
 
 const fetchPrem = async () => {
@@ -24,7 +27,7 @@ const fetchPrem = async () => {
 };
 
 export default function Home(): JSX.Element {
-    const { data, status } = useQuery('prem', fetchPrem);
+    const { data, status } = useQuery('prem', fetchPrem, { staleTime: Infinity });
 
     const teams: ITeam[] = data?.teams;
 
@@ -43,13 +46,17 @@ export default function Home(): JSX.Element {
                     {teams?.map((team) => (
                         <div className={styles.team} key={team.id}>
                             <div>
-                                <Image
-                                    width={80}
-                                    height={`auto`}
-                                    className={styles.crest}
-                                    src={team.crestUrl}
-                                    alt={team.shortName}
-                                />
+                                <Link href={`team/${team.id}`}>
+                                    <a>
+                                        <Image
+                                            width={80}
+                                            height={`auto`}
+                                            className={styles.crest}
+                                            src={team.crestUrl}
+                                            alt={team.shortName}
+                                        />
+                                    </a>
+                                </Link>
                             </div>
                             <p>{team.shortName}</p>
                             <p>{`Founded ${team.founded}`}</p>
